@@ -351,11 +351,13 @@ function loadFromLocalStorage() {
     if (fol) {
       state.trainingScores = fol.trainingScores || Array(10).fill(0);
       state.postTrainingScores = fol.postTrainingScores || Array(10).fill(0);
-      state.loaded = true;
-      renderUI();
     }
+    state.loaded = true;
+    renderUI();
   } catch (e) {
-    console.log('No data found');
+    console.log('No data found, showing default state');
+    state.loaded = true;
+    renderUI();
   }
 }
 
