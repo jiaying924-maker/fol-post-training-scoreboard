@@ -687,11 +687,6 @@ function renderStats() {
 function renderTeams() {
   const container = document.getElementById('teams-container');
 
-  if (!state.loaded) {
-    container.innerHTML = '<p style="color:var(--muted); text-align:center; padding:40px 20px;">👆 Load your scores above to start</p>';
-    return;
-  }
-
   container.innerHTML = state.trainingScores.map((training, i) => {
     const post = state.postTrainingScores[i];
     const total = training + post;
