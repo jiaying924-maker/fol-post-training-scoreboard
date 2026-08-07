@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FOL 2026 — Post-Training Scoreboard</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #111111;
+  --bg2:       #1A1A1A;
+  --card:      #1F1F1F;
+  --card2:     #252525;
+  --border:    #2A2A2A;
+  --border2:   #383838;
+  --yellow:    #F5C800;
+  --yellow-dk: #E8B800;
+  --red:       #CC2200;
+  --red-dim:   #2A0800;
+  --green:     #27AE60;
+  --green-dim: #0D2B18;
+  --text:      #DDDDDD;
+  --text-h:    #FFFFFF;
+  --muted:     #666666;
+}
+
+body {
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 20px;
+}
+
+header {
+  background: var(--bg);
+  color: var(--yellow);
+  padding: 20px;
+  border-bottom: 3px solid var(--yellow);
+  margin-bottom: 20px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.header-title {
+  font-size: 1.8em;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--yellow);
+  margin-bottom: 8px;
+}
+
+.header-sub {
+  font-size: 0.85em;
+  color: var(--muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.section {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+}
+
+.section-title {
+  font-size: 1.1em;
+  font-weight: 700;
+  color: var(--yellow);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+}
+
+.import-section {
+  background: var(--green-dim);
+  border: 2px solid var(--green);
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.import-note {
+  font-size: 0.9em;
+  color: var(--green);
+  margin-bottom: 12px;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9em;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-primary {
+  background: var(--yellow);
+  color: #000;
+}
+
+.btn-primary:hover {
+  background: var(--yellow-dk);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background: var(--card2);
+  color: var(--text);
+  border: 1px solid var(--border2);
+}
+
+.btn-secondary:hover {
+  border-color: var(--yellow);
+  color: var(--yellow);
+}
+
+.btn-success {
+  background: var(--green-dim);
+  color: var(--green);
+  border: 1px solid var(--green);
+}
+
+.btn-success:hover {
+  background: var(--green);
+  color: #000;
+}
+
+.btn-danger {
+  background: var(--red-dim);
+  color: var(--red);
+  border: 1px solid var(--red);
+}
+
+.btn-danger:hover {
+  background: var(--red);
+  color: #fff;
+}
+
+textarea, input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  font-family: monospace;
+  font-size: 0.9em;
+  margin-bottom: 10px;
+}
+
+textarea:focus, input:focus {
+  outline: none;
+  border-color: var(--yellow);
+  box-shadow: 0 0 10px rgba(245, 200, 0, 0.3);
+}
+
+.team-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--card2);
+  border-radius: 10px;
+  margin-bottom: 10px;
+  border: 1px solid var(--border2);
+}
+
+.team-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.team-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.team-name {
+  font-size: 0.95em;
+  font-weight: 700;
+  color: var(--text-h);
+  margin-bottom: 4px;
+}
+
+.team-scores {
+  font-size: 0.8em;
+  color: var(--muted);
+  display: flex;
+  gap: 20px;
+}
+
+.team-controls {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.score-input {
+  width: 60px;
+  padding: 6px;
+  font-size: 0.85em;
+  text-align: center;
+  font-weight: 600;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--yellow);
+  border-radius: 6px;
+}
+
+.btn-score {
+  padding: 6px 8px;
+  font-size: 0.75em;
+  min-width: 32px;
+}
+
+.leaderboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.team-card {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 14px 10px;
+  text-align: center;
+  border: 2px solid var(--border2);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.team-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--yellow);
+}
+
+.team-card.gold-border {
+  border-color: #FFD700 !important;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+}
+
+.team-card.silver-border {
+  border-color: #A0A0A0 !important;
+  box-shadow: 0 0 15px rgba(160, 160, 160, 0.2);
+}
+
+.team-card.bronze-border {
+  border-color: #CD7F32 !important;
+  box-shadow: 0 0 15px rgba(205, 127, 50, 0.2);
+}
+
+.team-rank {
+  font-size: 0.68em;
+  color: var(--muted);
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.team-name {
+  font-weight: 700;
+  font-size: 0.88em;
+  color: var(--text-h);
+  margin-bottom: 8px;
+}
+
+.tree-wrap {
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 8px 0;
+}
+
+.tree-wrap svg {
+  max-height: 100%;
+  max-width: 100%;
+}
+
+.team-score {
+  font-size: 1.7em;
+  font-weight: 800;
+  color: var(--yellow);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.team-pts-label {
+  font-size: 0.65em;
+  color: var(--muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.team-sub {
+  font-size: 0.6em;
+  color: var(--muted);
+}
+
+.history {
+  max-height: 300px;
+  overflow-y: auto;
+  background: var(--bg2);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.8em;
+}
+
+.history-item:last-child {
+  border-bottom: none;
+}
+
+.history-time {
+  color: var(--muted);
+  min-width: 140px;
+  font-family: monospace;
+}
+
+.history-team {
+  flex: 1;
+  font-weight: 600;
+}
+
+.history-delta {
+  font-weight: 700;
+  min-width: 40px;
+  text-align: right;
+}
+
+.history-delta.positive {
+  color: var(--green);
+}
+
+.history-delta.negative {
+  color: var(--red);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 1.8em;
+  font-weight: 800;
+  color: var(--yellow);
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 0.75em;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.message {
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  font-size: 0.9em;
+}
+
+.message.success {
+  background: var(--green-dim);
+  border: 1px solid var(--green);
+  color: var(--green);
+}
+
+.message.error {
+  background: var(--red-dim);
+  border: 1px solid var(--red);
+  color: var(--red);
+}
+
+.message.info {
+  background: #1A2A3A;
+  border: 1px solid #2A4A7A;
+  color: #6A9ACA;
+}
+
+@media (max-width: 600px) {
+  .team-row {
+    flex-wrap: wrap;
+  }
+
+  .team-controls {
+    width: 100%;
+    justify-content: space-between;
+    margin-top: 8px;
+  }
+
+  .stats {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-title">🌳 FOL 2026</div>
+  <div class="header-sub">Post-Training Scoreboard</div>
+</header>
+
+<div class="container">
+
+  <!-- Import Section -->
+  <div class="import-section">
+    <div class="import-note">📌 Step 1: Load your training scores from the main FOL dashboard</div>
+    <div class="button-group">
+      <button class="btn-success" onclick="loadFromLocalStorage()">📂 Load from Browser (FOL Dashboard)</button>
+      <button class="btn-secondary" onclick="document.getElementById('json-import').style.display = 'block'">📄 Load from JSON</button>
+      <button class="btn-secondary" onclick="loadSampleData()">🎯 Load Sample Data</button>
+    </div>
+    <div id="message"></div>
+  </div>
+
+  <!-- JSON Import Modal -->
+  <div id="json-import" style="display:none; background:var(--card2); padding:16px; border-radius:12px; margin-bottom:20px; border:1px solid var(--border);">
+    <div class="section-title">Import JSON Scores</div>
+    <p style="margin-bottom:12px; font-size:0.9em; color:var(--muted);">Paste your scores data in JSON format:</p>
+    <textarea id="json-input" placeholder='[45, 38, 52, ...]' style="min-height:100px;"></textarea>
+    <div class="button-group">
+      <button class="btn-primary" onclick="importFromJSON()">✓ Import</button>
+      <button class="btn-secondary" onclick="document.getElementById('json-import').style.display = 'none'">✕ Cancel</button>
+    </div>
+  </div>
+
+  <!-- Stats Overview -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-value" id="stat-teams">0</div>
+      <div class="stat-label">Teams Loaded</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-training">0</div>
+      <div class="stat-label">Total Training</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-posttraining">0</div>
+      <div class="stat-label">Total Post-Training</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-combined">0</div>
+      <div class="stat-label">Total Combined</div>
+    </div>
+  </div>
+
+  <!-- Scoring Section -->
+  <div class="section">
+    <div class="section-title">🎯 Award Post-Training Marks</div>
+    <div id="teams-container" style="min-height:200px;">
+      <p style="color:var(--muted); text-align:center; padding:40px 20px;">
+        👆 Load your scores above to start adding post-training marks
+      </p>
+    </div>
+  </div>
+
+  <!-- Leaderboard Section -->
+  <div class="section">
+    <div class="section-title">🏆 Leaderboard</div>
+    <div id="leaderboard" style="min-height:200px;">
+      <p style="color:var(--muted); text-align:center; padding:40px 20px;">
+        Leaderboard will appear here
+      </p>
+    </div>
+  </div>
+
+  <!-- History Section -->
+  <div class="section">
+    <div class="section-title">📋 Change History</div>
+    <div class="button-group" style="margin-bottom:12px;">
+      <button class="btn-secondary" onclick="exportData()">📥 Export Data</button>
+      <button class="btn-secondary" onclick="resetAllScores()">🔄 Reset All</button>
+      <button class="btn-danger" onclick="clearHistory()">🗑️ Clear History</button>
+    </div>
+    <div class="history" id="history">
+      <p style="color:var(--muted); text-align:center; padding:20px;">
+        Changes will appear here
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ==================== DATA ====================
+const TEAM_NAMES = [
+  '🏢 CSC', '🌿 BM', '🌿 RU', '🌿 GL', '🌿 GY',
+  '🌿 SS2', '🌿 PC', '🌿 CL', '🌿 MA', '🌿 SU'
+];
+
+const TEAM_COLORS = [
+  '#C0392B','#1E7A4A','#7D3C98','#2471A3','#D35400',
+  '#1ABC9C','#F39C12','#2980B9','#E74C3C','#27AE60'
+];
+
+let state = {
+  trainingScores: Array(10).fill(0),
+  postTrainingScores: Array(10).fill(0),
+  history: [],
+  loaded: false
+};
+
+// ==================== MESSAGE SYSTEM ====================
+function showMessage(text, type = 'info') {
+  const msg = document.getElementById('message');
+  msg.className = 'message ' + type;
+  msg.textContent = text;
+  msg.style.display = 'block';
+  if (type !== 'error') {
+    setTimeout(() => msg.style.display = 'none', 4000);
+  }
+}
+
+// ==================== DATA LOADING ====================
+function loadFromLocalStorage() {
+  try {
+    const fol = JSON.parse(localStorage.getItem('fol2026'));
+    if (!fol || !fol.scores) {
+      showMessage('❌ No FOL data found in browser. Have you opened the main dashboard yet?', 'error');
+      return;
+    }
+    state.trainingScores = [...fol.scores];
+    state.postTrainingScores = Array(10).fill(0);
+    state.loaded = true;
+    saveState();
+    renderUI();
+    showMessage('✅ Loaded ' + fol.scores.length + ' teams from FOL Dashboard', 'success');
+  } catch (e) {
+    showMessage('❌ Error loading data: ' + e.message, 'error');
+  }
+}
+
+function loadSampleData() {
+  state.trainingScores = [45, 38, 52, 41, 36, 48, 39, 55, 42, 47];
+  state.postTrainingScores = Array(10).fill(0);
+  state.loaded = true;
+  saveState();
+  renderUI();
+  showMessage('✅ Loaded sample data for testing', 'success');
+}
+
+function importFromJSON() {
+  try {
+    const text = document.getElementById('json-input').value.trim();
+    const scores = JSON.parse(text);
+
+    if (!Array.isArray(scores) || scores.length !== 10) {
+      throw new Error('Must be an array of 10 numbers');
+    }
+
+    if (!scores.every(s => typeof s === 'number')) {
+      throw new Error('All values must be numbers');
+    }
+
+    state.trainingScores = scores;
+    state.postTrainingScores = Array(10).fill(0);
+    state.loaded = true;
+    saveState();
+    renderUI();
+    document.getElementById('json-import').style.display = 'none';
+    showMessage('✅ Imported scores successfully', 'success');
+  } catch (e) {
+    showMessage('❌ Invalid JSON: ' + e.message, 'error');
+  }
+}
+
+// ==================== SCORING ====================
+function addPostTrainingScore(teamIdx, points) {
+  state.postTrainingScores[teamIdx] += points;
+  state.postTrainingScores[teamIdx] = Math.max(0, state.postTrainingScores[teamIdx]);
+
+  const t = new Date().toLocaleString();
+  state.history.unshift({
+    time: t,
+    team: TEAM_NAMES[teamIdx],
+    delta: points,
+    newTotal: getTotalScore(teamIdx)
+  });
+
+  saveState();
+  renderUI();
+}
+
+function getTotalScore(idx) {
+  return state.trainingScores[idx] + state.postTrainingScores[idx];
+}
+
+// ==================== STATE MANAGEMENT ====================
+function saveState() {
+  try {
+    localStorage.setItem('fol2026-posttraining', JSON.stringify(state));
+  } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('fol2026-posttraining'));
+    if (saved) state = saved;
+  } catch(e) {}
+}
+
+function resetAllScores() {
+  if (confirm('Reset all post-training scores to 0? Training scores will remain unchanged.')) {
+    state.postTrainingScores = Array(10).fill(0);
+    saveState();
+    renderUI();
+    showMessage('✅ Post-training scores reset', 'success');
+  }
+}
+
+function clearHistory() {
+  if (confirm('Clear all history? This cannot be undone.')) {
+    state.history = [];
+    saveState();
+    renderHistory();
+    showMessage('✅ History cleared', 'success');
+  }
+}
+
+// ==================== UI RENDERING ====================
+function renderUI() {
+  renderTeams();
+  renderLeaderboard();
+  renderHistory();
+  renderStats();
+}
+
+function renderStats() {
+  const totalTraining = state.trainingScores.reduce((a, b) => a + b, 0);
+  const totalPostTraining = state.postTrainingScores.reduce((a, b) => a + b, 0);
+  const totalCombined = totalTraining + totalPostTraining;
+
+  document.getElementById('stat-teams').textContent = state.loaded ? '10' : '0';
+  document.getElementById('stat-training').textContent = totalTraining;
+  document.getElementById('stat-posttraining').textContent = totalPostTraining;
+  document.getElementById('stat-combined').textContent = totalCombined;
+}
+
+function renderTeams() {
+  const container = document.getElementById('teams-container');
+
+  if (!state.loaded) {
+    container.innerHTML = '<p style="color:var(--muted); text-align:center; padding:40px 20px;">👆 Load your scores above to start</p>';
+    return;
+  }
+
+  container.innerHTML = state.trainingScores.map((training, i) => {
+    const post = state.postTrainingScores[i];
+    const total = training + post;
+    const color = TEAM_COLORS[i];
+
+    return `
+      <div class="team-row">
+        <div class="team-color" style="background:${color}"></div>
+        <div class="team-info">
+          <div class="team-name">${TEAM_NAMES[i]}</div>
+          <div class="team-scores">
+            <span>Training: <strong style="color:${color}">${training}</strong></span>
+            <span>Post: <strong style="color:var(--green)">${post}</strong></span>
+            <span>Total: <strong style="color:var(--yellow)">${total}</strong></span>
+          </div>
+        </div>
+        <div class="team-controls">
+          <button class="btn-score btn-success" onclick="addPostTrainingScore(${i}, 1)">+1</button>
+          <button class="btn-score btn-success" onclick="addPostTrainingScore(${i}, 5)">+5</button>
+          <button class="btn-score btn-danger" onclick="addPostTrainingScore(${i}, -1)">-1</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ==================== TREE GROWTH ====================
+function getTreeTier(score) {
+  if (score <= 10) return { tier: 0, name: '🌱 Seed', emoji: '🌱' };
+  if (score <= 25) return { tier: 1, name: '🌿 Sapling', emoji: '🌿' };
+  if (score <= 40) return { tier: 2, name: '🌳 Young Tree', emoji: '🌳' };
+  if (score <= 60) return { tier: 3, name: '🌲 Giant Tree', emoji: '🌲' };
+  if (score <= 80) return { tier: 4, name: '🍎 Fruitful Tree', emoji: '🍎' };
+  if (score <= 100) return { tier: 5, name: '🌟 Tree of Life', emoji: '🌟' };
+  return { tier: 5, name: '🌟 Tree of Life', emoji: '🌟' };
+}
+
+function getTreeCount(score) {
+  if (score <= 100) return 1;
+  // For scores > 100, show separate trees for each 100-point milestone
+  const completedForests = Math.floor(score / 100);
+  const remainder = score % 100;
+  return remainder > 0 ? completedForests + 1 : completedForests;
+}
+
+function getTreeSVG(score, color) {
+  const scoreInForest = ((score - 1) % 100) + 1;
+  const stage = scoreInForest <= 10 ? 0 : scoreInForest <= 25 ? 1 : scoreInForest <= 40 ? 2 : scoreInForest <= 60 ? 3 : scoreInForest <= 80 ? 4 : 5;
+  const cl = lighten(color, 55);
+
+  const trees = [
+    `<svg viewBox="0 0 80 90" width="70" height="70">
+      <ellipse cx="40" cy="83" rx="22" ry="6" fill="#A0782A" opacity="0.4"/>
+      <line x1="40" y1="78" x2="40" y2="83" stroke="#6B4F1A" stroke-width="3" stroke-linecap="round"/>
+      <ellipse cx="40" cy="74" rx="8" ry="6" fill="${color}" opacity="0.85"/>
+      <ellipse cx="40" cy="71" rx="4" ry="3" fill="${cl}" opacity="0.7"/>
+    </svg>`,
+    `<svg viewBox="0 0 80 90" width="70" height="70">
+      <ellipse cx="40" cy="84" rx="24" ry="6" fill="#A0782A" opacity="0.4"/>
+      <rect x="37.5" y="56" width="5" height="28" rx="2.5" fill="#7B5B1E"/>
+      <ellipse cx="40" cy="50" rx="14" ry="11" fill="${color}"/>
+      <ellipse cx="27" cy="57" rx="10" ry="8" fill="${color}" opacity="0.8"/>
+      <ellipse cx="53" cy="57" rx="10" ry="8" fill="${color}" opacity="0.8"/>
+      <ellipse cx="40" cy="43" rx="9" ry="7" fill="${cl}"/>
+    </svg>`,
+    `<svg viewBox="0 0 80 90" width="70" height="70">
+      <ellipse cx="40" cy="85" rx="26" ry="6" fill="#A0782A" opacity="0.4"/>
+      <rect x="36.5" y="50" width="7" height="36" rx="3" fill="#6B4F1A"/>
+      <ellipse cx="40" cy="42" rx="20" ry="16" fill="${color}"/>
+      <ellipse cx="22" cy="52" rx="14" ry="11" fill="${color}" opacity="0.85"/>
+      <ellipse cx="58" cy="52" rx="14" ry="11" fill="${color}" opacity="0.85"/>
+      <ellipse cx="40" cy="29" rx="13" ry="11" fill="${cl}" opacity="0.9"/>
+      <ellipse cx="28" cy="37" rx="10" ry="8" fill="${cl}" opacity="0.75"/>
+      <ellipse cx="52" cy="37" rx="10" ry="8" fill="${cl}" opacity="0.75"/>
+    </svg>`,
+    `<svg viewBox="0 0 80 90" width="70" height="70">
+      <ellipse cx="40" cy="86" rx="28" ry="6" fill="#A0782A" opacity="0.4"/>
+      <rect x="36" y="46" width="8" height="42" rx="3.5" fill="#5D4015"/>
+      <ellipse cx="40" cy="37" rx="24" ry="19" fill="${color}"/>
+      <ellipse cx="19" cy="49" rx="16" ry="13" fill="${color}" opacity="0.85"/>
+      <ellipse cx="61" cy="49" rx="16" ry="13" fill="${color}" opacity="0.85"/>
+      <ellipse cx="40" cy="23" rx="17" ry="13" fill="${cl}"/>
+      <ellipse cx="26" cy="32" rx="13" ry="10" fill="${cl}" opacity="0.75"/>
+      <ellipse cx="54" cy="32" rx="13" ry="10" fill="${cl}" opacity="0.75"/>
+    </svg>`,
+    `<svg viewBox="0 0 80 90" width="70" height="70">
+      <ellipse cx="40" cy="86" rx="28" ry="6" fill="#A0782A" opacity="0.4"/>
+      <rect x="36" y="45" width="8" height="43" rx="3.5" fill="#5D4015"/>
+      <ellipse cx="40" cy="35" rx="26" ry="21" fill="${color}"/>
+      <ellipse cx="17" cy="49" rx="17" ry="14" fill="${color}" opacity="0.85"/>
+      <ellipse cx="63" cy="49" rx="17" ry="14" fill="${color}" opacity="0.85"/>
+      <ellipse cx="40" cy="20" rx="19" ry="15" fill="${cl}"/>
+      <ellipse cx="25" cy="30" rx="14" ry="11" fill="${cl}" opacity="0.75"/>
+      <ellipse cx="55" cy="30" rx="14" ry="11" fill="${cl}" opacity="0.75"/>
+      <circle cx="30" cy="42" r="4" fill="#E74C3C"/>
+      <circle cx="50" cy="40" r="4" fill="#E74C3C"/>
+      <circle cx="20" cy="52" r="3.5" fill="#E74C3C"/>
+      <circle cx="60" cy="48" r="3.5" fill="#E74C3C"/>
+      <circle cx="40" cy="48" r="4" fill="#F39C12"/>
+      <circle cx="33" cy="30" r="3" fill="#E74C3C" opacity="0.8"/>
+      <text x="33" y="12" font-size="10" fill="#FFD700" text-anchor="middle">★</text>
+      <text x="47" y="9" font-size="7" fill="#FFD700">★</text>
+    </svg>`,
+    `<svg viewBox="0 0 80 90" width="70" height="70">
+      <ellipse cx="40" cy="83" rx="24" ry="7" fill="#A0782A" opacity="0.5"/>
+      <rect x="37" y="55" width="6" height="28" rx="3" fill="#6B4F1A"/>
+      <ellipse cx="40" cy="52" rx="22" ry="18" fill="${color}"/>
+      <ellipse cx="40" cy="25" rx="20" ry="16" fill="${cl}"/>
+      <ellipse cx="22" cy="36" rx="15" ry="12" fill="${cl}" opacity="0.8"/>
+      <ellipse cx="58" cy="36" rx="15" ry="12" fill="${cl}" opacity="0.8"/>
+      <circle cx="28" cy="48" r="4" fill="#FFD700"/>
+      <circle cx="52" cy="46" r="4" fill="#FFD700"/>
+      <circle cx="18" cy="54" r="3.5" fill="#FFD700"/>
+      <circle cx="62" cy="50" r="3.5" fill="#FFD700"/>
+      <circle cx="40" cy="52" r="4.5" fill="#FFD700"/>
+      <circle cx="32" cy="30" r="3" fill="#FFD700" opacity="0.9"/>
+      <circle cx="50" cy="28" r="3" fill="#FFD700" opacity="0.9"/>
+      <text x="40" y="10" font-size="13" fill="#FFD700" text-anchor="middle" opacity="0.95">★</text>
+      <text x="26" y="18" font-size="9" fill="#FFD700" text-anchor="middle">★</text>
+      <text x="54" y="16" font-size="9" fill="#FFD700" text-anchor="middle">★</text>
+    </svg>`,
+  ];
+  return trees[stage];
+}
+
+function lighten(hex, amt) {
+  let r = parseInt(hex.slice(1,3),16);
+  let g = parseInt(hex.slice(3,5),16);
+  let b = parseInt(hex.slice(5,7),16);
+  r = Math.min(255, r + amt); g = Math.min(255, g + amt); b = Math.min(255, b + amt);
+  return '#' + [r,g,b].map(x => x.toString(16).padStart(2,'0')).join('');
+}
+
+function renderLeaderboard() {
+  const container = document.getElementById('leaderboard');
+
+  if (!state.loaded) {
+    container.innerHTML = '<p style="color:var(--muted); text-align:center; padding:40px 20px;">Load scores to see leaderboard</p>';
+    return;
+  }
+
+  const ranked = state.trainingScores.map((training, i) => ({
+    idx: i,
+    name: TEAM_NAMES[i],
+    color: TEAM_COLORS[i],
+    training,
+    post: state.postTrainingScores[i],
+    total: training + state.postTrainingScores[i]
+  })).sort((a, b) => b.total - a.total);
+
+  container.innerHTML = ranked.map((team, rank) => {
+    const rankEmoji = rank === 0 ? '🥇' : rank === 1 ? '🥈' : rank === 2 ? '🥉' : `#${rank + 1}`;
+    const borderClass = rank === 0 ? 'gold-border' : rank === 1 ? 'silver-border' : rank === 2 ? 'bronze-border' : '';
+    const scoreInForest = ((team.total - 1) % 100) + 1;
+    const tier = getTreeTier(scoreInForest);
+    const treeCount = getTreeCount(team.total);
+    const treeSvg = getTreeSVG(team.total, team.color);
+
+    // Build multiple tree display
+    let treesHtml = '';
+
+    // Show completed Tree of Life SVGs
+    const completedForests = Math.floor(team.total / 100);
+    for (let i = 0; i < completedForests; i++) {
+      treesHtml += getTreeSVG(100, team.color); // Full tree at 100pts = Tree of Life
+    }
+
+    // Show current growing tree
+    if (team.total % 100 > 0 || team.total === 0) {
+      treesHtml += treeSvg;
+    }
+
+    let tierLabel = tier.name;
+    if (completedForests > 0) {
+      tierLabel = `🌟×${completedForests} + ${tier.emoji} ${tier.name}`;
+    }
+
+    return `
+      <div class="team-card ${borderClass}">
+        <div class="team-rank">${rankEmoji}</div>
+        <div class="team-name">${team.name}</div>
+        <div class="tree-wrap" style="display:flex;justify-content:center;gap:4px;flex-wrap:wrap">
+          ${treesHtml}
+        </div>
+        <div class="team-score">${team.total}</div>
+        <div class="team-pts-label" style="color:var(--yellow);font-weight:600">${tierLabel}</div>
+        <div class="team-sub">${team.training} + ${team.post}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderHistory() {
+  const container = document.getElementById('history');
+
+  if (state.history.length === 0) {
+    container.innerHTML = '<p style="color:var(--muted); text-align:center; padding:20px;">No changes yet</p>';
+    return;
+  }
+
+  container.innerHTML = state.history.map(h => {
+    const deltaClass = h.delta > 0 ? 'positive' : 'negative';
+    const sign = h.delta > 0 ? '+' : '';
+
+    return `
+      <div class="history-item">
+        <div class="history-time">${h.time}</div>
+        <div class="history-team">${h.team}</div>
+        <div class="history-delta ${deltaClass}">${sign}${h.delta}</div>
+        <div style="color:var(--muted);font-size:0.75em;">→ ${h.newTotal}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ==================== EXPORT ====================
+function exportData() {
+  const data = {
+    timestamp: new Date().toISOString(),
+    trainingScores: state.trainingScores,
+    postTrainingScores: state.postTrainingScores,
+    combined: state.trainingScores.map((t, i) => t + state.postTrainingScores[i]),
+    teams: TEAM_NAMES,
+    history: state.history
+  };
+
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'fol-posttraining-' + new Date().toISOString().slice(0, 10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+
+  showMessage('✅ Data exported as JSON', 'success');
+}
+
+// ==================== INIT ====================
+document.addEventListener('DOMContentLoaded', () => {
+  loadState();
+  if (state.loaded) {
+    renderUI();
+  }
+});
+</script>
+
+</body>
+</html>

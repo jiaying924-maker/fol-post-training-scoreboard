@@ -1,0 +1,30 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE/Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Score data (use instructions to generate)
+FOL-SCORES-EXTRACTED.json
+FOL-2026-TRAINING-SCORES.json
+FOL-2026-SCORES-DETAILED.json
+scores-template.json
+
+# Backup/temp files
+*.bak
+*.tmp
+*.log
+
+# Node/build (if using in future)
+node_modules/
+dist/
+build/
+
+# Local development
+.env.local
+local-scores.json
