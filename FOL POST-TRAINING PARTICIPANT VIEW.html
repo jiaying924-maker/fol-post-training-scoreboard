@@ -476,6 +476,9 @@ function renderLeaderboard() {
       tierLabel = `🌟×${completedForests} + ${tier.emoji} ${tier.name}`;
     }
 
+    const training = state.trainingScores[team.idx];
+    const postTraining = state.postTrainingScores[team.idx];
+
     return `
       <div class="team-card ${borderClass}">
         <div class="team-rank">${rankEmoji}</div>
@@ -484,6 +487,7 @@ function renderLeaderboard() {
           ${treesHtml}
         </div>
         <div class="team-score">${team.total}</div>
+        <div style="font-size:0.75em;color:var(--muted);margin-top:4px;">${training} ${postTraining > 0 ? `+${postTraining}` : ''}</div>
         <div class="team-pts-label" style="color:var(--yellow);font-weight:600">${tierLabel}</div>
       </div>
     `;
