@@ -288,47 +288,40 @@ header {
 }
 
 .admin-button {
-  position: fixed;
-  top: 20px;
-  right: 20px;
   background: linear-gradient(135deg, var(--yellow), var(--yellow-dk));
   color: #000;
   border: none;
-  padding: 12px 20px;
+  padding: 10px 16px;
   border-radius: 8px;
   font-weight: 600;
-  font-size: 0.9em;
+  font-size: 0.85em;
   cursor: pointer;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   transition: all 0.3s;
   box-shadow: 0 4px 12px rgba(245, 200, 0, 0.3);
+  white-space: nowrap;
 }
 
 .admin-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(245, 200, 0, 0.5);
 }
-
-@media (max-width: 768px) {
-  .admin-button {
-    position: static;
-    margin-bottom: 20px;
-    width: 100%;
-    justify-content: center;
-  }
-}
 </style>
 </head>
 <body>
 
 <header>
-  <a href="FOL%20POST-TRAINING%20SCOREBOARD.html" class="admin-button">🔧 Admin Dashboard</a>
-  <div class="header-title">🌳 FOL 2026 Forest Challenge</div>
-  <div class="header-sub">Live Team Rankings</div>
-  <div class="header-tagline">Growing together · Building tomorrow</div>
+  <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px;">
+    <div>
+      <div class="header-title">🌳 FOL 2026 Forest Challenge</div>
+      <div class="header-sub">Live Team Rankings</div>
+      <div class="header-tagline">Growing together · Building tomorrow</div>
+    </div>
+    <a href="FOL%20POST-TRAINING%20SCOREBOARD.html" class="admin-button">🔧 Admin</a>
+  </div>
 </header>
 
 <div class="container">
